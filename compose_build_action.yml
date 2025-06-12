@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: registry.cn-hangzhou.aliyuncs.com/wjn0918/soft:easybd-web
+    container_name: easybd-web
+    ports:
+      - "3000:80"
+    networks:
+      - easybd-network
+    depends_on:
+      - backend
+
+networks:
+  easybd-network:
+    driver: bridge
