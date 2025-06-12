@@ -22,11 +22,8 @@ import { SortableColumnItem } from "./SortableColumnItem";
 
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
+import { ToDataX } from "./ToDataX";
 
-
-import { ToDataX } from "./ToDatax";
-
-const inputTyps: string[] = ["TXT", "JDBC"]
 
 
 export default function ExcelConverter() {
@@ -57,7 +54,6 @@ export default function ExcelConverter() {
   const [colMetadata, setColMetadata] = useState<Record<string, { prefix: string; suffix: string }>>({});
 
   const [copied, setCopied] = useState(false);
-  const [inputType, setInputType] = useState<string>("json");
 
 
   const colMetadataList = Object.entries(colMetadata).map(([col, { prefix, suffix }]) => ({
@@ -184,7 +180,7 @@ export default function ExcelConverter() {
       if (direction === "excel-to-text") {
         if (!filePath || !selectedSheet) return alert("请先上传并选择 Sheet");
 
-        const res = await excelConvert(excelInfo, outputType);
+        const res = await excelConvert(excelInfo!, outputType);
         const data = await res.data;
         setResult(data);
 

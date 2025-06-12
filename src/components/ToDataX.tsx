@@ -3,7 +3,7 @@ import { AlertTriangle, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import type { ExcelInfo } from "@/types/excel"
-import { getSheetTables, getColInfo } from "@/api/excel"
+import { getSheetTables } from "@/api/excel"
 
 type ReaderType = "STREAM" | "PGSQL"
 type WriterType = "STREAM" | "PGSQL"
