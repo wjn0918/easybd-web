@@ -7,10 +7,6 @@ services:
     container_name: easybd-web
     ports:
       - "3000:80"
-    networks:
-      - easybd-network
-    depends_on:
-      - backend
 
 networks:
   easybd-network:
