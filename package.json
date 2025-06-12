@@ -23,9 +23,9 @@
     "lucide-react": "^0.514.0",
     "path": "^0.12.7",
     "postcss": "^8.5.4",
-    "react": "^19.1.0",
     "react-beautiful-dnd": "^13.1.1",
-    "react-dom": "^19.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^7.6.2",
     "tailwind-merge": "^3.3.1"
   },
