@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 
 const tools = [
-  { name: "测试", path: "/excel-to-json" },
-  { name: "测试2", path: "/cs2" },
+  { name: "excel转换工具", path: "/excel-converter" },
 ];
 
 export default function Home() {

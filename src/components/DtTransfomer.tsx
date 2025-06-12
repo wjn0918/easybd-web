@@ -15,19 +15,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-
-type Step = {
-  id: string;
-  action: "filter" | "assign" | "rename" | "dropna";
-  expr: string | object;
-};
+import type { TransformStep } from "@/types/excel";
 
 interface Props {
-  value: Step[];
-  onChange: (steps: Step[]) => void;
+  value: TransformStep[];
+  onChange: (steps: TransformStep[]) => void;
 }
 
-const getPlaceholder = (action: Step["action"]) => {
+const getPlaceholder = (action: TransformStep["action"]) => {
   switch (action) {
     case "filter":
       return "如：df['age'] > 30";
@@ -48,8 +43,8 @@ function SortableItem({
   onExprChange,
   onRemove,
 }: {
-  step: Step;
-  onActionChange: (id: string, action: Step["action"]) => void;
+  step: TransformStep;
+  onActionChange: (id: string, action: TransformStep["action"]) => void;
   onExprChange: (id: string, expr: string) => void;
   onRemove: (id: string) => void;
 }) {
@@ -79,7 +74,7 @@ function SortableItem({
         className="border px-2 py-1 rounded"
         value={step.action}
         onChange={(e) =>
-          onActionChange(step.id, e.target.value as Step["action"])
+          onActionChange(step.id, e.target.value as TransformStep["action"])
         }
       >
         <option value="filter">filter</option>
@@ -109,7 +104,7 @@ function SortableItem({
 }
 
 export function DtTransfomer({ value, onChange }: Props) {
-  const [steps, setSteps] = useState<Step[]>([]);
+  const [steps, setSteps] = useState<TransformStep[]>([]);
 
   useEffect(() => {
     const withIds = value.map((step, i) => ({
@@ -120,7 +115,7 @@ export function DtTransfomer({ value, onChange }: Props) {
     setSteps(withIds);
   }, [value]);
 
-  const emitChange = (updated: Step[]) => {
+  const emitChange = (updated: TransformStep[]) => {
     const parsed = updated.map(({ id, action, expr }) => {
       let parsedExpr: any = expr;
       if (action === "rename" || action === "dropna") {
@@ -154,7 +149,7 @@ export function DtTransfomer({ value, onChange }: Props) {
   };
 
   const handleAdd = () => {
-    const newStep: Step = {
+    const newStep: TransformStep = {
       id: Date.now() + "_" + Math.random(),
       action: "filter",
       expr: "",
@@ -170,7 +165,7 @@ export function DtTransfomer({ value, onChange }: Props) {
     emitChange(updated);
   };
 
-  const handleActionChange = (id: string, action: Step["action"]) => {
+  const handleActionChange = (id: string, action: TransformStep["action"]) => {
     const updated = steps.map((s) =>
       s.id === id ? { ...s, action, expr: "" } : s
     );

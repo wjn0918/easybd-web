@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { SheetInfo } from '../types/sheet'
-import type { ExcelInfo } from '@/types/excel'
+import type { ExcelInfo, JsonInfo } from '@/types/excel'
+import type { TableInfo } from '@/types/table'
 
 const instance = axios.create(
     {
@@ -10,7 +11,11 @@ const instance = axios.create(
 )
 
 export const getSheetInfo = () => {
-    return instance.get<SheetInfo>('/cols')
+    return instance.get<SheetInfo>('/sheetInfo')
+}
+
+export const getSheetTables = (excelInfo: ExcelInfo) => {
+    return instance.post<TableInfo>('/tables', excelInfo)
 }
 
 export const getColInfo = (excelInfo: ExcelInfo) => {
@@ -30,4 +35,11 @@ export const excelConvert = (excelInfo: ExcelInfo, outputType: string) => {
         output_type: outputType,
       },
     });
+  };
+
+
+  export const convert2Excel = (jsonInfo: JsonInfo) => {
+    return instance.post('/convert2excel', jsonInfo,{
+        responseType: 'blob'
+      });
   };
