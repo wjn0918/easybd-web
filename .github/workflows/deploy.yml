@@ -45,3 +45,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             docker pull registry.cn-hangzhou.aliyuncs.com/wjn0918/soft:easybd-web
+            docker compose -f /opt/easybd/compose.yml down
+            docker compose -f /opt/easybd/compose.yml up -d

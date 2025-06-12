@@ -43,7 +43,6 @@ const DatabaseTool = () => {
   const [selectedTables, setSelectedTables] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [regexFilter, setRegexFilter] = useState('');
-  const [exportProgress, setExportProgress] = useState(0);
   const [exporting, setExporting] = useState(false);
 
   const initial = getInitialConfig();
@@ -122,7 +121,7 @@ const DatabaseTool = () => {
         </div>
 
         <Button onClick={handleTestConnection} disabled={loading}>
-          {loading ? '测试中...' : '测试连接'}
+          {loading ? '连接中...' : '连接数据库'}
         </Button>
 
         {connected && (
@@ -183,7 +182,6 @@ const DatabaseTool = () => {
                   onClick={async () => {
                     try {
                       setExporting(true);
-                      setExportProgress(0);
 
                       const res = await exportTableStructure(
                         {
@@ -213,20 +211,11 @@ const DatabaseTool = () => {
                       console.error(error);
                     } finally {
                       setExporting(false);
-                      setExportProgress(0);
                     }
                   }}
                 >
-                  {exporting ? `导出中 (${exportProgress}%)` : '导出表结构'}
+                  {exporting ? `导出中` : '导出表结构'}
                 </Button>
-
-                {exporting && (
-                  <Progress
-                    value={exportProgress}
-                    max={100}
-                    className="mt-2"
-                  />
-                )}
               </>
             )}
 

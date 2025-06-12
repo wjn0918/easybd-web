@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 const tools = [
   { name: "excel转换工具", path: "/excel-converter" },
+  { name: "数据库转换工具", path: "/database-converter" },
 ];
 
 export default function Home() {
