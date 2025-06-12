@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +11,6 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { exportTableStructure, testConnect } from '@/api/database';
-import { Progress } from '@/components/ui/progress';
 
 const STORAGE_KEY = 'db_connection_config';
 type DbType = 'mysql' | 'pgsql';
