@@ -1,13 +1,7 @@
-import axios from 'axios'
+import instance from "./axiosInstance"
 
-const instance = axios.create(
-    {
-        baseURL: "/api/file",
-        timeout:10000,
-    }
-)
 
 export const upload= () =>{
-    return instance.post('/upload')
+    return instance.post('/file/upload')
 }
 

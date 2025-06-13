@@ -25,6 +25,8 @@ import { Copy } from "lucide-react";
 
 
 import { ToDataX } from "./ToDataX";
+import { ToSql } from "./ToSql";
+import type { SQLType, DBType } from "@/types/sql";
 
 
 
@@ -37,10 +39,13 @@ export default function ExcelConverter() {
   const [selectedSheet, setSelectedSheet] = useState<string | null>(null);
   const [excelInfo, setExcelInfo] = useState<ExcelInfo>();
   const [selectTable, setSelectedTable] = useState<string | null>(null);
+  const [sqlType, setSqlType] = useState<SQLType>("ddl");
+  const [dbType, setDbType] = useState<DBType>("pgsql");
 
-  const [dataXConf, setDataXConf] = useState<{ readerType: string; writerType: string }>({
+  const [dataXConf, setDataXConf] = useState<{ readerType: string; writerType: string, parameter: string }>({
     readerType: "STREAM",  // 默认值
     writerType: "STREAM", // 默认值
+    parameter: ""
   });
 
   const [text, setText] = useState("");
@@ -102,6 +107,10 @@ export default function ExcelConverter() {
       tableName: selectTable,
       transformSteps: jsonSteps,
       colMetadata: colMetadataList,
+      sqlConf: {
+        sqlType: sqlType,
+        dbType: dbType
+      }
     };
 
     setExcelInfo(updatedExcelInfo);
@@ -122,7 +131,7 @@ export default function ExcelConverter() {
       }
     }
 
-  }, [outputType, selectedSheet, selectTable, dataXConf, filePath]);
+  }, [outputType, selectedSheet, selectTable, dataXConf, filePath, dbType, sqlType]);
 
   const handleCopy = async () => {
     try {
@@ -190,7 +199,7 @@ export default function ExcelConverter() {
         const jsonInfo: JsonInfo = {
           jsonData: text
         }
-        
+
         // const res = await fetch("/api/convert-to-excel", {
         //   method: "POST",
         //   headers: { "Content-Type": "application/json" },
@@ -330,11 +339,29 @@ export default function ExcelConverter() {
 
                   {outputType === "datax" && excelInfo && (
                     <ToDataX excelInfo={excelInfo}
-                      onSelectTable={(table) => {
-                        console.log("父组件选中表名：", table)
-                        setSelectedTable(table) // 可保存到父组件的 state
+                      onSelectTable={(tableName, tableComment) => {
+                        console.log(`父组件选中表名：${tableName} 表备注： ${tableComment}`, )
+                        setSelectedTable(tableName) // 可保存到父组件的 state
                       }}
                       onSelectDataxConf={setDataXConf}
+                    />
+                  )}
+
+                  {outputType === "sql" && excelInfo && (
+                    <ToSql excelInfo={excelInfo}
+                      onSelectTable={(tableName, tableComment) => {
+                        console.log("父组件选中表名：", tableName, tableComment)
+                        setSelectedTable(tableName) // 可保存到父组件的 state
+                      }}
+                      onSelectSQLType={(type) => {
+                        console.log("选中的 SQL 类型是：", type)
+                        setSqlType(type)
+                      }
+                    }
+                      onSelectDBType={(db) => {
+                        console.log("选中的数据库是：", db)
+                        setDbType(db)
+                      }}
                     />
                   )}
 

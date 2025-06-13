@@ -1,0 +1,18 @@
+// import type { ConfigModel } from '@/types/config'
+import type { ConfigModel } from '@/types/config';
+import instance from './axiosInstance'
+
+
+
+
+  export const getAllConfigs = () => {
+    return instance.get('/config/select');
+  };
+
+  export const saveConfig = (conf: ConfigModel) => {
+    return instance.post('/config/create', conf);
+  };
+
+  export const deleteConfig = (id: string) => {
+    return instance.delete(`/config/${id}`);
+  };
