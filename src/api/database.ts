@@ -11,3 +11,9 @@ export const exportTableStructure = (params: ExportTableStructureParams) => {
         responseType: 'blob'
       });
   };
+
+  export const convertToSQLite = async (params: ExportTableStructureParams) => {
+    return instance.post('/database/convert-to-sqlite', params, {
+      responseType: 'blob',
+    });
+  };

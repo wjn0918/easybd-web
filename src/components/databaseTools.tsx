@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { exportTableStructure, testConnect } from '@/api/database';
+import { exportTableStructure, testConnect, convertToSQLite } from '@/api/database';
 
 const STORAGE_KEY = 'db_connection_config';
 type DbType = 'mysql' | 'pgsql';
@@ -43,6 +43,7 @@ const DatabaseTool = () => {
   const [loading, setLoading] = useState(false);
   const [regexFilter, setRegexFilter] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [converting, setConverting] = useState(false);
 
   const initial = getInitialConfig();
   const [dbType, setDbType] = useState<DbType>(initial.dbType);
@@ -77,6 +78,7 @@ const DatabaseTool = () => {
       if (data.success) {
         setConnected(true);
         setTables(data.tables);
+        setSelectedTables([]); // ✅ 成功连接后清空已选表（更严谨）
       } else {
         alert('连接失败：' + data.message);
       }
@@ -101,7 +103,10 @@ const DatabaseTool = () => {
   return (
     <Card className="max-w-xl mx-auto mt-10 p-4 space-y-4">
       <CardContent className="space-y-4">
-        <Select value={dbType} onValueChange={value => setDbType(value as DbType)}>
+        <Select value={dbType} onValueChange={value => {
+          setDbType(value as DbType);
+          setSelectedTables([]); // ✅ 切换数据库类型时清空已选择的表
+        }}>
           <SelectTrigger>
             <SelectValue placeholder="选择数据库类型" />
           </SelectTrigger>
@@ -210,11 +215,54 @@ const DatabaseTool = () => {
                       console.error(error);
                     } finally {
                       setExporting(false);
+                      setSelectedTables([]);
                     }
                   }}
                 >
                   {exporting ? `导出中` : '导出表结构'}
                 </Button>
+
+                <Button
+                  className="mt-2"
+                  disabled={converting}
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      setConverting(true);
+
+                      const res = await convertToSQLite({
+                        dbType,
+                        host: config.host,
+                        port: Number(config.port),
+                        username: config.username,
+                        password: config.password,
+                        database: config.database,
+                        tables: selectedTables,
+                      });
+
+                      const blob = new Blob([res.data], {
+                        type: res.headers['content-type'] || 'application/octet-stream',
+                      });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'converted.sqlite';
+                      a.click();
+                      URL.revokeObjectURL(url);
+
+                      alert('转换成功，SQLite 文件已下载');
+                    } catch (error) {
+                      console.error(error);
+                      alert('转换失败，请查看控制台日志');
+                    } finally {
+                      setConverting(false);
+                      setSelectedTables([]);
+                    }
+                  }}
+                >
+                  {converting ? '转换中...' : '转为 SQLite'}
+                </Button>
+
               </>
             )}
 
