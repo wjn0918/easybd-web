@@ -16,3 +16,7 @@ import instance from './axiosInstance'
   export const deleteConfig = (id: string) => {
     return instance.delete(`/config/${id}`);
   };
+
+  export const updateConfig = (conf: ConfigModel) => {
+    return instance.post(`/config/update/${conf.id}`, conf);
+  };

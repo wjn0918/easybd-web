@@ -131,7 +131,7 @@ export default function ExcelConverter() {
       }
     }
 
-  }, [outputType, selectedSheet, selectTable, dataXConf, filePath, dbType, sqlType]);
+  }, [outputType, selectedSheet, selectTable, dataXConf, filePath, dbType, sqlType, jsonSteps, colMetadata]);
 
   const handleCopy = async () => {
     try {
@@ -143,15 +143,23 @@ export default function ExcelConverter() {
     }
   };
 
-  const handleSwap = () => {
-    setDirection((d) => (d === "excel-to-text" ? "text-to-excel" : "excel-to-text"));
-    setFile(null);
+  const clearData = () => {
     setText("");
     setResult("");
+    setJsonSteps([]);
+    setColMetadata({});
+    setAvailableColumns([]);
+    setColumns([]);
+    setSelectedSheet(null);
+  }
+
+  const handleSwap = () => {
+    setDirection((d) => (d === "excel-to-text" ? "text-to-excel" : "excel-to-text"));
+    clearData()
+    setFile(null);
+    setSheetList([]);
     setFileName(null);
     setFilePath("");
-    setSelectedSheet(null);
-    setSheetList([]);
   };
 
   const handleUploadAndParse = async () => {
@@ -182,6 +190,8 @@ export default function ExcelConverter() {
     } catch (err) {
       alert("上传或解析失败");
       console.error(err);
+    }finally{
+      clearData()
     }
   };
 
@@ -377,7 +387,7 @@ export default function ExcelConverter() {
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {columns.map((col) => {
-                        const isSelected = columns.includes(col);
+                        const isSelected = availableColumns.includes(col);;
                         return (
                           <div
                             key={col}

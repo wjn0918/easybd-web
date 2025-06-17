@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import ConfigForm from "./ConfigForm";
-import { deleteConfig, getAllConfigs, saveConfig } from "@/api/config";
+import { deleteConfig, getAllConfigs, saveConfig, updateConfig } from "@/api/config";
 import type { ConfigModel } from "@/types/config";
 
 type ConfigType = "database" | "datax";
@@ -40,6 +40,7 @@ export default function ConfigListPage() {
     let newConfigs;
     if (config.id) {
       // 更新
+      updateConfig(config)
       newConfigs = configs.map((c) => (c.id === config.id ? config : c));
     } else {
       // 新增

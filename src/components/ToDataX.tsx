@@ -7,7 +7,7 @@ import { getSheetTables } from "@/api/excel"
 import { getAllConfigs } from "@/api/config"
 import type { ConfigModel } from "@/types/config"
 
-type ReaderType = "STREAM" | "PGSQL"
+type ReaderType = "STREAM" | "PGSQL" | "SRAPI"
 type WriterType = "STREAM" | "PGSQL"
 
 const writerTypes: { label: string; value: WriterType }[] = [
@@ -17,6 +17,7 @@ const writerTypes: { label: string; value: WriterType }[] = [
 const readerTypes: { label: string; value: ReaderType }[] = [
     { label: "STREAM", value: "STREAM" },
     { label: "PGSQL", value: "PGSQL" },
+    { label: "SRAPI", value: "SRAPI" },
 ]
 
 interface ToDataXProps {
