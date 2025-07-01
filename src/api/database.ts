@@ -17,3 +17,14 @@ export const exportTableStructure = (params: ExportTableStructureParams) => {
       responseType: 'blob',
     });
   };
+
+  export async function syncToTargetDb(payload: {
+    source: {  },
+    target: {  }
+  }) {
+    return instance.post('/database/sync2target', payload)
+    // 逻辑：
+    // 1. 从源数据库导出数据
+    // 2. 在目标数据库建表（如必要）
+    // 3. 插入数据
+  }

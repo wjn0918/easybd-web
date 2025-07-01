@@ -10,12 +10,15 @@ import type { ConfigModel } from "@/types/config";
 const configTypes = [
   { label: "数据库配置", value: "database" },
   { label: "DataX 配置", value: "datax" },
+  { label: "DataX Reader 配置", value: "dataxReader" },
+  { label: "DataX Writer 配置", value: "dataxWriter" },
 ];
 
 // 每种配置类型对应的样例 JSON
 const configExamples: Record<string, string> = {
   database: JSON.stringify(
     {
+      dbtype: "",
       host: "localhost",
       port: 5432,
       username: "user",
@@ -33,6 +36,32 @@ const configExamples: Record<string, string> = {
         "writerJdbcUrl": "jdbc:postgresql://localhost:5432/easybd",
         "writerUserName": "postgres",
         "writerPassword": "123456"
+    
+    },
+    null,
+    2
+  ),
+  dataxReader: JSON.stringify(
+    {
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "database": "cs",
+        "username": "root",
+        "password": "123456"
+    
+    },
+    null,
+    2
+  ),
+  dataxWriter: JSON.stringify(
+    {
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "database": "cs",
+        "username": "root",
+        "password": "123456"
     
     },
     null,
@@ -135,12 +164,13 @@ export default function ConfigForm({ config, onSave, onCancel }: Props) {
         <div className="text-sm bg-muted border rounded-md p-4">
           <div className="flex justify-between items-center mb-2">
             <p className="font-semibold text-gray-700">配置样例：</p>
+            <p className="text-xs text-gray-500">支持的 dbType：pgsql、clickhouse、mysql</p>
             <Button
               variant="link"
               size="sm"
               onClick={() => setConfContent(configExamples[confType])}
             >
-              使用该样例
+              使用该样例 
             </Button>
           </div>
           <pre className="text-xs text-gray-800 whitespace-pre-wrap">

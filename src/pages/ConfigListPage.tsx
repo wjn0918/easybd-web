@@ -6,7 +6,7 @@ import ConfigForm from "./ConfigForm";
 import { deleteConfig, getAllConfigs, saveConfig, updateConfig } from "@/api/config";
 import type { ConfigModel } from "@/types/config";
 
-type ConfigType = "database" | "datax";
+type ConfigType = "database" | "datax" | "dataxReader";
 
 
 export default function ConfigListPage() {
@@ -79,6 +79,8 @@ export default function ConfigListPage() {
             <SelectItem value="all">全部类型</SelectItem>
             <SelectItem value="database">数据库配置</SelectItem>
             <SelectItem value="datax">DataX 配置</SelectItem>
+            <SelectItem value="dataxReader">dataxReader 配置</SelectItem>
+            <SelectItem value="dataxWriter">dataxWriter 配置</SelectItem>
           </SelectContent>
         </Select>
 

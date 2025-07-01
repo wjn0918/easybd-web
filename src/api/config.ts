@@ -8,7 +8,9 @@ import instance from './axiosInstance'
   export const getAllConfigs = () => {
     return instance.get('/config/select');
   };
-
+  export const getAllConfigsByType = (confType: string) => {
+    return instance.get(`/config/select/${confType}`);
+  };
   export const saveConfig = (conf: ConfigModel) => {
     return instance.post('/config/create', conf);
   };

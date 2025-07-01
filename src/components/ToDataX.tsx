@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import type { ExcelInfo } from "@/types/excel"
 import { getSheetTables } from "@/api/excel"
-import { getAllConfigs } from "@/api/config"
+import { getAllConfigsByType } from "@/api/config"
 import type { ConfigModel } from "@/types/config"
 
 type ReaderType = "STREAM" | "PGSQL" | "SRAPI"
-type WriterType = "STREAM" | "PGSQL"
+type WriterType = "STREAM" | "PGSQL" | "CLICKHOUSE"
 
 const writerTypes: { label: string; value: WriterType }[] = [
     { label: "STREAM", value: "STREAM" },
     { label: "PGSQL", value: "PGSQL" },
+    { label: "CLICKHOUSE", value: "CLICKHOUSE" },
 ]
 const readerTypes: { label: string; value: ReaderType }[] = [
     { label: "STREAM", value: "STREAM" },
@@ -67,7 +68,7 @@ export function ToDataX({
 
     // 加载配置项
     useEffect(() => {
-        getAllConfigs()
+        getAllConfigsByType("datax")
             .then((res) => {
                 setConfigs(res.data || [])
             })
@@ -95,32 +96,33 @@ export function ToDataX({
                 </Alert>
             </div>
 
-            {/* 配置选择 */}
-            <div className="mt-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">选择公共配置：</h3>
-                <select
-                    className="border rounded px-3 py-2 text-sm"
-                    value={selectedConfigId ?? ""}
-                    onChange={(e) => {
-                        const id = e.target.value
-                        setSelectedConfigId(id)
-                        const selected = configs.find((c) => c.id === id)
-                        if (selected) {
-                            onSelectConfig?.(selected)
-                            setParameter(selected.confContent)
-                        }
-                    }}
-                >
-                    <option value="" disabled>
-                        请选择一个配置
-                    </option>
-                    {configs.map((config) => (
-                        <option key={config.id} value={config.id}>
-                            [{config.confType}] {config.confName}
-                        </option>
-                    ))}
-                </select>
+            {/* 表格选择 */}
+            <div className="flex flex-wrap gap-2 mt-4">
+                {tableList.map((nameAndComment) => {
+                    const tableName = nameAndComment[0]
+                    const tableComment = nameAndComment[1]
+                    console.log(tableName)
+                    const isSelected = selectTable === tableName
+                    return (
+                        <div
+                            key={tableName}
+                            onClick={() => {
+                                setSelectedTable(tableName)
+                                onSelectTable?.(tableName, tableComment)
+                            }}
+                            className={`cursor-pointer px-4 py-2 rounded-xl border text-sm shadow-sm transition-all 
+              ${isSelected
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "bg-white text-gray-800 border-gray-300 hover:border-blue-400"
+                                }`}
+                        >
+                            {tableComment}
+                        </div>
+                    )
+                })}
             </div>
+
+            
 
             {/* Reader Type */}
             <div className="space-y-6 mt-4">
@@ -164,31 +166,34 @@ export function ToDataX({
                 </div>
             </div>
 
-            {/* 表格选择 */}
-            <div className="flex flex-wrap gap-2 mt-4">
-                {tableList.map((nameAndComment) => {
-                    const tableName = nameAndComment[0]
-                    const tableComment = nameAndComment[1]
-                    console.log(tableName)
-                    const isSelected = selectTable === tableName
-                    return (
-                        <div
-                            key={tableName}
-                            onClick={() => {
-                                setSelectedTable(tableName)
-                                onSelectTable?.(tableName, tableComment)
-                            }}
-                            className={`cursor-pointer px-4 py-2 rounded-xl border text-sm shadow-sm transition-all 
-              ${isSelected
-                                    ? "bg-blue-600 text-white border-blue-600"
-                                    : "bg-white text-gray-800 border-gray-300 hover:border-blue-400"
-                                }`}
-                        >
-                            {tableComment}
-                        </div>
-                    )
-                })}
+            {/* 配置选择 */}
+            <div className="mt-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">选择公共配置：</h3>
+                <select
+                    className="border rounded px-3 py-2 text-sm"
+                    value={selectedConfigId ?? ""}
+                    onChange={(e) => {
+                        const id = e.target.value
+                        setSelectedConfigId(id)
+                        const selected = configs.find((c) => c.id === id)
+                        if (selected) {
+                            onSelectConfig?.(selected)
+                            setParameter(selected.confContent)
+                        }
+                    }}
+                >
+                    <option value="" disabled>
+                        请选择一个配置
+                    </option>
+                    {configs.map((config) => (
+                        <option key={config.id} value={config.id}>
+                            [{config.confType}] {config.confName}
+                        </option>
+                    ))}
+                </select>
             </div>
+
+            
         </>
     )
 }
