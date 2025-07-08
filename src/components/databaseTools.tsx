@@ -10,9 +10,10 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { exportTableStructure, testConnect, convertToSQLite, syncToTargetDb } from '@/api/database';
+import { exportTableStructure, testConnect, convertToSQLite, syncToTargetDb, convert2ddl } from '@/api/database';
 import type { ConfigModel } from '@/types/config';
 import { getAllConfigsByType } from '@/api/config';
+import { Copy } from "lucide-react";
 
 type DbType = 'mysql' | 'pgsql';
 type TargetDbType = 'clickhouse' | 'pgsql';
@@ -41,7 +42,7 @@ const DatabaseTool = () => {
 
   const initial = getInitialConfig();
   const [dbType, setDbType] = useState<DbType>(initial.dbType);
-  const [config, setConfig] = useState(initial.config);
+  const [sourceConfig, setSourceConfig] = useState(initial.config);
   const [targetDbType, setTargetDbType] = useState<TargetDbType>('clickhouse');
   const [targetConfig, setTargetConfig] = useState({
     host: '',
@@ -56,6 +57,31 @@ const DatabaseTool = () => {
   const [selectedSourceConfigId, setSelectedSourceConfigId] = useState<string | null>(null)
   const [selectedTargetConfigId, setSelectedTargetConfigId] = useState<string | null>(null)
 
+  const [ddlResult, setddlResult] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [outputType, setOutputType] = useState<"excel" | "sqllite" | "ddl">("excel");
+
+  const [ddlDBType, setddlDBType] = useState<"pgsql" | "clickhouse"| "">("");
+
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(ddlResult).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
+
+  useEffect(() => {
+    convert2ddl({
+      ddlType: ddlDBType,
+      source: sourceConfig,
+      tables: selectedTables
+    }).then((res) => {
+      setddlResult(res.data)
+    })
+  }, [ddlDBType, tables])
+  
 
   // 加载配置项
   useEffect(() => {
@@ -76,7 +102,7 @@ const DatabaseTool = () => {
       .catch(() => {
         setConfigs([])
       })
-  }, [config, dbType]);
+  }, [sourceConfig, dbType]);
 
   const handleTestConnection = async () => {
     setLoading(true);
@@ -86,11 +112,11 @@ const DatabaseTool = () => {
     try {
       const response = await testConnect({
         dbType,
-        host: config.host,
-        port: Number(config.port),
-        username: config.username,
-        password: config.password,
-        database: config.database,
+        host: sourceConfig.host,
+        port: Number(sourceConfig.port),
+        username: sourceConfig.username,
+        password: sourceConfig.password,
+        database: sourceConfig.database,
       });
 
       const data = response.data;
@@ -147,8 +173,8 @@ const DatabaseTool = () => {
                 const selected = configs.find((c) => c.id === id)
                 if (selected) {
                   const c = JSON.parse(selected.confContent)
-                  setConfig({ ...config, ...c })
-                  console.log(config)
+                  setSourceConfig({ ...sourceConfig, ...c })
+                  console.log(sourceConfig)
                 }
               }}
             >
@@ -221,88 +247,64 @@ const DatabaseTool = () => {
               {/* 新增的导出按钮 */}
               {selectedTables.length > 0 && (
                 <>
-                  <Button
-                    className="mt-4"
-                    disabled={exporting}
-                    onClick={async () => {
-                      try {
-                        setExporting(true);
 
-                        const res = await exportTableStructure(
-                          {
-                            dbType,
-                            host: config.host,
-                            port: Number(config.port),
-                            username: config.username,
-                            password: config.password,
-                            database: config.database,
-                            tables: selectedTables,
-                          }
-                        );
 
-                        const blob = new Blob([res.data], {
-                          type: res.headers['content-type'] || 'application/octet-stream',
-                        });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'converted.xlsx';
-                        a.click();
-                        URL.revokeObjectURL(url);
+                  <div className="flex gap-2">
+                    {["excel", "sqllite", "ddl"].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setOutputType(type as any)}
+                        className={`px-4 py-1 rounded border text-sm ${outputType === type
+                          ? "bg-blue-500 text-white"
+                          : "bg-white border-gray-300 text-gray-700"
+                          }`}
+                      >
+                        {type.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
 
-                        alert('导出成功，文件已下载');
-                      } catch (error) {
-                        alert('导出失败，请检查控制台');
-                        console.error(error);
-                      } finally {
-                        setExporting(false);
-                        setSelectedTables([]);
-                      }
-                    }}
-                  >
-                    {exporting ? `导出中` : '导出表结构'}
-                  </Button>
+                  {
+                    outputType === "ddl" && (
+                      <div className="flex gap-2">
+                        {["pgsql", "clickhouse"].map((type) => (
+                          <button
+                            key={type}
+                            onClick={() => setddlDBType(type as any)}
+                            className={`px-4 py-1 rounded border text-sm ${ddlDBType === type
+                              ? "bg-blue-500 text-white"
+                              : "bg-white border-gray-300 text-gray-700"
+                              }`}
+                          >
+                            {type.toUpperCase()}
+                          </button>
+                        ))}
+                      </div>
+                    )
+                  }
 
-                  <Button
-                    className="mt-2"
-                    disabled={converting}
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        setConverting(true);
 
-                        const res = await convertToSQLite({
-                          dbType,
-                          host: config.host,
-                          port: Number(config.port),
-                          username: config.username,
-                          password: config.password,
-                          database: config.database,
-                          tables: selectedTables,
-                        });
-
-                        const blob = new Blob([res.data], {
-                          type: res.headers['content-type'] || 'application/octet-stream',
-                        });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'converted.sqlite';
-                        a.click();
-                        URL.revokeObjectURL(url);
-
-                        alert('转换成功，SQLite 文件已下载');
-                      } catch (error) {
-                        console.error(error);
-                        alert('转换失败，请查看控制台日志');
-                      } finally {
-                        setConverting(false);
-                        setSelectedTables([]);
-                      }
-                    }}
-                  >
-                    {converting ? '转换中...' : '转为 SQLite'}
-                  </Button>
+                  {/* 只有 result 有内容时才显示结果区域 */}
+                  {ddlResult && (
+                    <div className="relative mt-4">
+                      <textarea
+                        readOnly
+                        value={ddlResult}
+                        rows={14}
+                        className="w-full bg-gray-100 border p-2 rounded font-mono text-sm"
+                        placeholder="转换结果将显示在这里"
+                      />
+                      <Button
+                        onClick={handleCopy}
+                        variant="secondary"
+                        size="sm"
+                        className="absolute top-2 right-2 px-2 py-1 h-auto text-xs"
+                      >
+                        <Copy className="w-4 h-4 mr-1" />
+                        {copied ? '已复制' : '复制'}
+                      </Button>
+                    </div>
+                  )}
 
                 </>
               )}
@@ -365,11 +367,11 @@ const DatabaseTool = () => {
                   const res = await syncToTargetDb({
                     source: {
                       dbType,
-                      host: config.host,
-                      port: Number(config.port),
-                      username: config.username,
-                      password: config.password,
-                      database: config.database,
+                      host: sourceConfig.host,
+                      port: Number(sourceConfig.port),
+                      username: sourceConfig.username,
+                      password: sourceConfig.password,
+                      database: sourceConfig.database,
                       tables: selectedTables,
                     },
                     target: {
