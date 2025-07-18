@@ -33,6 +33,7 @@ export function ToSql({
     const dbTypes: { label: string; value: DBType }[] = [
         { label: "PostgreSQL", value: "pgsql" },
         { label: "MySQL", value: "mysql" },
+        { label: "ClickHouse", value: "clickhouse" },
     ];
 
     useEffect(() => {

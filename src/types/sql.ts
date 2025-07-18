@@ -1,2 +1,2 @@
 export type SQLType = "ddl" | "dml";
-export type DBType = "pgsql" | "mysql";
+export type DBType = "pgsql" | "mysql" | "clickhouse";

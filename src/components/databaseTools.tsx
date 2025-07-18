@@ -80,7 +80,7 @@ const DatabaseTool = () => {
     }).then((res) => {
       setddlResult(res.data)
     })
-  }, [ddlDBType, tables])
+  }, [ddlDBType, tables, selectedTables])
   
 
   // 加载配置项
@@ -247,7 +247,88 @@ const DatabaseTool = () => {
               {/* 新增的导出按钮 */}
               {selectedTables.length > 0 && (
                 <>
+                  <Button
+                    className="mt-4"
+                    disabled={exporting}
+                    onClick={async () => {
+                      try {
+                        setExporting(true);
 
+                        const res = await exportTableStructure(
+                          {
+                            dbType,
+                            host: sourceConfig.host,
+                            port: Number(sourceConfig.port),
+                            username: sourceConfig.username,
+                            password: sourceConfig.password,
+                            database: sourceConfig.database,
+                            tables: selectedTables,
+                          }
+                        );
+
+                        const blob = new Blob([res.data], {
+                          type: res.headers['content-type'] || 'application/octet-stream',
+                        });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'converted.xlsx';
+                        a.click();
+                        URL.revokeObjectURL(url);
+
+                        alert('导出成功，文件已下载');
+                      } catch (error) {
+                        alert('导出失败，请检查控制台');
+                        console.error(error);
+                      } finally {
+                        setExporting(false);
+                        setSelectedTables([]);
+                      }
+                    }}
+                  >
+                    {exporting ? `导出中` : '导出表结构'}
+                  </Button>
+
+                  <Button
+                    className="mt-2"
+                    disabled={converting}
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        setConverting(true);
+
+                        const res = await convertToSQLite({
+                          dbType,
+                          host: sourceConfig.host,
+                          port: Number(sourceConfig.port),
+                          username: sourceConfig.username,
+                          password: sourceConfig.password,
+                          database: sourceConfig.database,
+                          tables: selectedTables,
+                        });
+
+                        const blob = new Blob([res.data], {
+                          type: res.headers['content-type'] || 'application/octet-stream',
+                        });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'converted.sqlite';
+                        a.click();
+                        URL.revokeObjectURL(url);
+
+                        alert('转换成功，SQLite 文件已下载');
+                      } catch (error) {
+                        console.error(error);
+                        alert('转换失败，请查看控制台日志');
+                      } finally {
+                        setConverting(false);
+                        setSelectedTables([]);
+                      }
+                    }}
+                  >
+                    {converting ? '转换中...' : '转为 SQLite'}
+                  </Button>
 
                   <div className="flex gap-2">
                     {["excel", "sqllite", "ddl"].map((type) => (

@@ -4,6 +4,7 @@ const tools = [
   { name: "cs", path: "/cs" },
   { name: "excel转换工具", path: "/excel-converter" },
   { name: "数据库转换工具", path: "/database-converter" },
+  { name: "文本转换工具", path: "/txt-converter" },
 ];
 
 export default function Home() {
