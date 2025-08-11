@@ -24,6 +24,8 @@ interface Props {
 
 const getPlaceholder = (action: TransformStep["action"]) => {
   switch (action) {
+    case "select":
+      return "如：df[['name', 'age']]";
     case "filter":
       return "如：df['age'] > 30";
     case "assign":
@@ -77,6 +79,7 @@ function SortableItem({
           onActionChange(step.id, e.target.value as TransformStep["action"])
         }
       >
+        <option value="select">select</option>
         <option value="filter">filter</option>
         <option value="assign">assign</option>
         <option value="rename">rename</option>

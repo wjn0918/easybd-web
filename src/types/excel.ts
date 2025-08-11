@@ -2,7 +2,7 @@ import type { DBType, SQLType } from "./sql";
 
 export interface TransformStep {
   id: string;
-  action: "filter" | "assign" | "rename" | "dropna";
+  action: "select"|"filter" | "assign" | "rename" | "dropna";
   expr: string | object;
 }
 

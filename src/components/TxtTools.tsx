@@ -11,6 +11,16 @@ export default function TxtTools() {
   const toLower = () => setText(text.toLowerCase())
   const trimSpaces = () => setText(text.replace(/\s+/g, " ").trim())
 
+  const beautifulDDL = () => {
+    // 把 , 换成 换行 + 缩进两个空格
+    const formatted = text
+      .split(",")           // 先按逗号拆分
+      .map(part => part.trim()) // 去掉多余空格
+      .join(",\n  ");       // 换行并缩进
+
+    setText(formatted);
+  };
+
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(text)
     toast("✅ 已复制到剪贴板")
@@ -36,6 +46,7 @@ export default function TxtTools() {
             <Button variant="default" onClick={toUpper}>转大写</Button>
             <Button variant="secondary" onClick={toLower}>转小写</Button>
             <Button variant="outline" onClick={trimSpaces}>去多余空格</Button>
+            <Button variant="secondary" onClick={beautifulDDL}>美化DDL</Button>
             <Button variant="destructive" onClick={() => setText("")}>清空</Button>
             <Button variant="default" onClick={copyToClipboard}>复制结果</Button>
           </div>

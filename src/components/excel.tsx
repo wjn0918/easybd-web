@@ -100,6 +100,7 @@ export default function ExcelConverter() {
 
 
   useEffect(() => {
+    setResult("");
     const updatedExcelInfo: ExcelInfo = {
       filePath: filePath,
       sheetName: selectedSheet,
